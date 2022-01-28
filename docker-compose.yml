@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  postgresdb:
+    image: postgres:14.1
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=University
+    ports:
+      - "5432:5432"
+  app:
+    depends_on:
+      - postgresdb
+    image: tankevych/university
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+      "spring.datasource.url" : "jdbc:postgresql://postgresdb:5432/University?
+      createDatabaseIfNotExist=true",
+      "spring.datasource.username" : "postgres",
+      "spring.datasource.password" : "1234",
+      "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.PostgreSQLDialect",
+      "spring.jpa.hibernate.ddl-auto" : "create-drop"
+      }'
